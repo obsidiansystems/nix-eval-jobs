@@ -3,11 +3,15 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.nix-patched = {
+    url = "github:cidkidnix/nix/dylan-ifd-fix";
+  };
 
   outputs =
     { self
     , nixpkgs
     , flake-utils
+    , nix-patched
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -18,7 +22,7 @@
         devShell = self.devShells.${system}.default;
         drvArgs = {
           srcDir = self;
-          nix = if nixVersion == "unstable" then pkgs.nixUnstable else pkgs.nixVersions."nix_${nixVersion}";
+          nix = nix-patched.packages.${system}.nix;
         };
       in
       {
